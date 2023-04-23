@@ -1,5 +1,5 @@
 const Card = require('../models/card');
-const {setResponse} = require('../utils/utils')
+const {setResponse, validateText, validateUrl, errorResponse} = require('../utils/utils')
 
 module.exports.getCard = (req, res) => {
   Card.find({})
@@ -9,10 +9,31 @@ module.exports.getCard = (req, res) => {
 
 module.exports.createCard = (req, res) => {
   const {name, link} = req.body;
+  let profile = {};
+  let errors = [];
 
-  Card.create({name, link, owner: req.user._id})
-    .then(card => setResponse({res, messageKey: 'data', message: card}))
-    .catch(() => setResponse({res, httpStatus: 500}))
+  const nameValidation = validateText(name);
+  const linkValidation = validateUrl(link)
+
+  if (nameValidation === true) {
+    profile['name'] = name;
+  } else {
+    errors.push(nameValidation)
+  }
+  if (linkValidation === true) {
+    profile['link'] = link;
+  } else {
+    errors.push(linkValidation)
+  }
+
+  if (errorResponse(res, profile, errors)) {
+    Card.create(
+      {name, link, owner: req.user._id},
+      {new: true, runValidators: true}
+    )
+      .then(card => setResponse({res, messageKey: 'data', message: card}))
+      .catch(() => setResponse({res, httpStatus: 500}))
+  }
 }
 
 module.exports.deleteCard = (req, res) => {
