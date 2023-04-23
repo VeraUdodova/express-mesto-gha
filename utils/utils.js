@@ -1,5 +1,3 @@
-const { ObjectId } = require('mongoose').Types;
-
 const HTTP_200 = 200;
 const HTTP_201 = 201;
 const HTTP_400 = 400;
@@ -29,56 +27,27 @@ const setResponse = (
   return res.status(httpStatus).send(result);
 };
 
-// const validateText = (text) => {
-//   if (typeof text !== 'undefined' && text.length >= 2 && text.length <= 30) {
-//     return true;
-//   }
-//
-//   return [`${Object.keys({text})[0]}: не удовлетворят параметрам`]
-// }
-//
-// const validateUrl = (url) => {
-//   if (typeof url !== 'undefined' && url.length > 0) {
-//     return true;
-//   }
-//
-//   return [`${Object.keys({url})[0]}: не удовлетворят параметрам`]
-// }
+const errorResponse = (res, errors) => {
+  let httpStatus = HTTP_500;
+  let { message } = errors;
 
-const errorResponse = (res, profile, errors) => {
-  if (Object.keys(profile).length === 0) {
-    errors.push('Ничего не передано');
+  if (errors.name === 'ValidationError') {
+    httpStatus = HTTP_400;
+  } else if (errors.name === 'CastError') {
+    httpStatus = HTTP_400;
+    message = 'id некорректен';
   }
 
-  if (errors.length > 0) {
-    setResponse({
-      res,
-      message: errors,
-      httpStatus: HTTP_400,
-    });
-
-    return false;
-  }
-
-  return true;
-};
-
-const validateId = (res, id) => {
-  if (!ObjectId.isValid(id)) {
-    setResponse({
-      res, message: 'id некорректен', httpStatus: HTTP_400,
-    });
-
-    return false;
-  }
-
-  return true;
+  setResponse({
+    res,
+    message,
+    httpStatus,
+  });
 };
 
 module.exports = {
   setResponse,
   errorResponse,
-  validateId,
   HTTP_404,
   HTTP_200,
   HTTP_400,
