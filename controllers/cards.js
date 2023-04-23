@@ -4,13 +4,16 @@ const {
   validateText,
   validateUrl,
   errorResponse,
-  validateId
+  validateId,
+  HTTP_404,
+  HTTP_201,
+  HTTP_500
 } = require('../utils/utils')
 
 module.exports.getCards = (req, res) => {
   Card.find({})
     .then(cards => setResponse({res, messageKey: 'data', message: cards}))
-    .catch(() => setResponse({res, httpStatus: 500}))
+    .catch(() => setResponse({res, httpStatus: HTTP_500}))
 }
 
 module.exports.createCard = (req, res) => {
@@ -34,8 +37,8 @@ module.exports.createCard = (req, res) => {
 
   if (errorResponse(res, profile, errors)) {
     Card.create({name, link, owner: req.user._id})
-      .then(card => setResponse({res, messageKey: null, message: card, httpStatus: 201}))
-      .catch(() => setResponse({res, httpStatus: 500}))
+      .then(card => setResponse({res, messageKey: null, message: card, httpStatus: HTTP_201}))
+      .catch(() => setResponse({res, httpStatus: HTTP_500}))
   }
 }
 
@@ -47,11 +50,11 @@ module.exports.deleteCard = (req, res) => {
       .then(card => {
         setResponse(
           card === null ?
-            {res, message: 'Карточка не найдена', httpStatus: 404} :
-            {res, message: 'Карточка удалена', httpStatus: 200}
+            {res, message: 'Карточка не найдена', httpStatus: HTTP_404} :
+            {res, message: 'Карточка удалена'}
         )
       })
-      .catch(() => setResponse({res, httpStatus: 500}))
+      .catch(() => setResponse({res, httpStatus: HTTP_500}))
   }
 }
 
@@ -67,10 +70,10 @@ module.exports.likeCard = (req, res) => {
       .then(card => {
         setResponse(
           card === null ?
-            {res, message: 'Карточка не найдена', httpStatus: 404} :
-            {res, message: card, messageKey: 'data', httpStatus: 201})
+            {res, message: 'Карточка не найдена', httpStatus: HTTP_404} :
+            {res, message: card, messageKey: 'data', httpStatus: HTTP_201})
       })
-      .catch(() => setResponse({res, httpStatus: 500}))
+      .catch(() => setResponse({res, httpStatus: HTTP_500}))
   }
 }
 
@@ -86,9 +89,9 @@ module.exports.dislikeCard = (req, res) => {
       .then(card => {
         setResponse(
           card === null ?
-            {res, message: 'Карточка не найдена', httpStatus: 404} :
-            {res, message: card, messageKey: 'data', httpStatus: 200})
+            {res, message: 'Карточка не найдена', httpStatus: HTTP_404} :
+            {res, message: card, messageKey: 'data'})
       })
-      .catch(() => setResponse({res, httpStatus: 500}))
+      .catch(() => setResponse({res, httpStatus: HTTP_500}))
   }
 }

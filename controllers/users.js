@@ -1,11 +1,10 @@
-const ObjectId = require('mongoose').Types.ObjectId;
 const User = require('../models/user');
 const {
   setResponse,
   validateText,
   validateUrl,
   errorResponse,
-  validateId
+  validateId, HTTP_404, HTTP_500, HTTP_201
 } = require('../utils/utils')
 
 module.exports.getUser = (req, res) => {
@@ -16,18 +15,18 @@ module.exports.getUser = (req, res) => {
       .then(user => {
         setResponse(
           user === null ?
-            {res, message: 'Пользователь не найден', httpStatus: 404} :
+            {res, message: 'Пользователь не найден', httpStatus: HTTP_404} :
             {res, messageKey: 'data', message: user}
         )
       })
-      .catch(() => setResponse({res, httpStatus: 500}))
+      .catch(() => setResponse({res, httpStatus: HTTP_500}))
   }
 }
 
 module.exports.getUsers = (req, res) => {
   User.find({})
     .then(users => setResponse({res, messageKey: 'data', message: users}))
-    .catch(() => setResponse({res, httpStatus: 500}))
+    .catch(() => setResponse({res, httpStatus: HTTP_500}))
 }
 
 module.exports.createUser = (req, res) => {
@@ -59,8 +58,8 @@ module.exports.createUser = (req, res) => {
 
   if (errorResponse(res, profile, errors)) {
     User.create({name, about, avatar})
-      .then(user => setResponse({res, messageKey: null, message: user, httpStatus: 201}))
-      .catch(() => setResponse({res, httpStatus: 500}));
+      .then(user => setResponse({res, messageKey: null, message: user, httpStatus: HTTP_201}))
+      .catch(() => setResponse({res, httpStatus: HTTP_500}));
   }
 };
 
@@ -75,9 +74,9 @@ const profileUpdateResponse = (res, req, profile, errors) => {
     )
       .then(user => setResponse(
         user === null ?
-          {res, message: 'Пользователь не найден', httpStatus: 404} :
+          {res, message: 'Пользователь не найден', httpStatus: HTTP_404} :
           {res, messageKey: 'user', message: user}))
-      .catch(() => setResponse({res, httpStatus: 500}))
+      .catch(() => setResponse({res, httpStatus: HTTP_500}))
   }
 }
 

@@ -1,7 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
-const {setResponse} = require('./utils/utils')
+const {setResponse, HTTP_404} = require('./utils/utils')
 
 const {PORT = 3000} = process.env;
 
@@ -23,7 +23,7 @@ app.use('/users', require('./routes/users'))
 app.use('/cards', require('./routes/cards'))
 
 app.use((req, res) => {
-  setResponse({res, message: 'Страница не найдена', httpStatus: 404})
+  setResponse({res, message: 'Страница не найдена', httpStatus: HTTP_404})
 })
 
 app.listen(PORT, () => {

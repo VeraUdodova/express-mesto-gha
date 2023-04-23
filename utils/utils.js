@@ -5,11 +5,11 @@ const setResponse = (
     res,
     messageKey = 'message',
     message,
-    httpStatus = 200
+    httpStatus = HTTP_200
   }) => {
   let result;
 
-  if (httpStatus === 500 && typeof message === 'undefined') {
+  if (httpStatus === HTTP_500 && typeof message === 'undefined') {
     result = {[messageKey]: 'На сервере произошла ошибка'};
   } else if (messageKey === 'message' && typeof message !== 'string') {
     result = {[messageKey]: message.join('\n')};
@@ -47,7 +47,7 @@ const errorResponse = (res, profile, errors) => {
     setResponse({
       res: res,
       message: errors,
-      httpStatus: 400
+      httpStatus: HTTP_400
     })
 
     return false
@@ -59,7 +59,7 @@ const errorResponse = (res, profile, errors) => {
 const validateId = (res, id) => {
   if (!ObjectId.isValid(id)) {
     setResponse({
-      res, message: 'id некорректен', httpStatus: 400
+      res, message: 'id некорректен', httpStatus: HTTP_400
     });
 
     return false;
@@ -68,7 +68,21 @@ const validateId = (res, id) => {
   return true;
 }
 
+const HTTP_200 = 200;
+const HTTP_201 = 201;
+const HTTP_400 = 400;
+const HTTP_404 = 404;
+const HTTP_500 = 500;
 
 module.exports = {
-  setResponse, validateUrl, errorResponse, validateText, validateId
+  setResponse,
+  validateUrl,
+  errorResponse,
+  validateText,
+  validateId,
+  HTTP_404,
+  HTTP_200,
+  HTTP_400,
+  HTTP_500,
+  HTTP_201
 }
