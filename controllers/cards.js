@@ -15,9 +15,27 @@ module.exports.createCard = (req, res) => {
 }
 
 module.exports.deleteCard = (req, res) => {
-  console.log(req.params)
-  console.log(req.params.cardId)
   Card.findByIdAndDelete(req.params.cardId)
     .then(() => res.status(204).send({message: 'Карточка удалена'}))
+    .catch(() => res.status(500).send({message: 'На сервере произошла ошибка'}));
+}
+
+module.exports.likeCard = (req, res) => {
+  Card.findByIdAndUpdate(
+    req.params.cardId,
+    {$addToSet: {likes: req.user._id}},
+    {new: true}
+  )
+    .then(() => res.status(204).send({message: 'Лайк установлен'}))
+    .catch(() => res.status(500).send({message: 'На сервере произошла ошибка'}));
+}
+
+module.exports.dislikeCard = (req, res) => {
+  Card.findByIdAndUpdate(
+    req.params.cardId,
+    {$pull: {likes: req.user._id}},
+    {new: true}
+  )
+    .then(() => res.status(204).send({message: 'Лайк удален'}))
     .catch(() => res.status(500).send({message: 'На сервере произошла ошибка'}));
 }

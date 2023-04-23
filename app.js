@@ -8,7 +8,6 @@ const app = express();
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
-
 app.use((req, res, next) => {
   req.user = {
     _id: '644392bfbf64737d49e63f34' // вставьте сюда _id созданного в предыдущем пункте пользователя
