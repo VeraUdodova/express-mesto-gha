@@ -9,7 +9,7 @@ module.exports.setResponse = (
     message = 'На сервере произошла ошибка';
   }
 
-  if (typeof message !== 'string') {
+  if (messageKey === 'message' && typeof message !== 'string') {
     message = message.join('\n')
   }
 
