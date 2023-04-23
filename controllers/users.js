@@ -1,33 +1,32 @@
 const ObjectId = require('mongoose').Types.ObjectId;
 const User = require('../models/user');
-const {setResponse, validateText, validateUrl, errorResponse} = require('../utils/utils')
+const {
+  setResponse,
+  validateText,
+  validateUrl,
+  errorResponse,
+  validateId
+} = require('../utils/utils')
 
 module.exports.getUser = (req, res) => {
   const {userId} = req.params;
 
-  if (!ObjectId.isValid(userId)) {
-    setResponse({
-      res, message: 'id некорректен', httpStatus: 400
-    });
-    return;
+  if (validateId(res, userId)) {
+    User.findById(userId)
+      .then(user => {
+        setResponse(
+          user === null ?
+            {res, message: 'Пользователь не найден', httpStatus: 404} :
+            {res, messageKey: 'data', message: user}
+        )
+      })
+      .catch(() => setResponse({res, httpStatus: 500}))
   }
-
-  User.findById(userId)
-    .then(user => {
-      setResponse(
-        user === null ?
-          {res, message: 'Пользователь не найден', httpStatus: 404} :
-          {res, messageKey: 'data', message: user}
-      )
-    })
-    .catch(() => setResponse({res, httpStatus: 500}))
 }
 
 module.exports.getUsers = (req, res) => {
   User.find({})
-    .then(users => {
-      setResponse({res, messageKey: 'data', message: users})
-    })
+    .then(users => setResponse({res, messageKey: 'data', message: users}))
     .catch(() => setResponse({res, httpStatus: 500}))
 }
 
@@ -60,23 +59,24 @@ module.exports.createUser = (req, res) => {
 
   if (errorResponse(res, profile, errors)) {
     User.create({name, about, avatar})
-      .then(user => setResponse({res, messageKey: 'id', message: user._id, httpStatus: 201}))
+      .then(user => setResponse({res, messageKey: null, message: user, httpStatus: 201}))
       .catch(() => setResponse({res, httpStatus: 500}));
   }
 };
 
 const profileUpdateResponse = (res, req, profile, errors) => {
-  if (errorResponse(res, profile, errors)) {
+  const userId = req.user._id;
+
+  if (validateId(res, userId) && errorResponse(res, profile, errors)) {
     User.findByIdAndUpdate(
-      req.user._id,
+      userId,
       profile,
       {new: true, runValidators: true}
     )
-      .then((user) => setResponse({
-        res,
-        messageKey: 'user',
-        message: user
-      }))
+      .then(user => setResponse(
+        user === null ?
+          {res, message: 'Пользователь не найден', httpStatus: 404} :
+          {res, messageKey: 'user', message: user}))
       .catch(() => setResponse({res, httpStatus: 500}))
   }
 }

@@ -1,3 +1,5 @@
+const ObjectId = require('mongoose').Types.ObjectId;
+
 const setResponse = (
   {
     res,
@@ -5,15 +7,19 @@ const setResponse = (
     message,
     httpStatus = 200
   }) => {
+  let result;
+
   if (httpStatus === 500 && typeof message === 'undefined') {
-    message = 'На сервере произошла ошибка';
+    result = {[messageKey]: 'На сервере произошла ошибка'};
+  } else if (messageKey === 'message' && typeof message !== 'string') {
+    result = {[messageKey]: message.join('\n')};
+  } else if (messageKey == null) {
+    result = message;
+  } else {
+    result = {[messageKey]: message}
   }
 
-  if (messageKey === 'message' && typeof message !== 'string') {
-    message = message.join('\n')
-  }
-
-  return res.status(httpStatus).send({[messageKey]: message})
+  return res.status(httpStatus).send(result)
 }
 
 const validateText = (text) => {
@@ -50,6 +56,19 @@ const errorResponse = (res, profile, errors) => {
   return true
 }
 
+const validateId = (res, id) => {
+  if (!ObjectId.isValid(id)) {
+    setResponse({
+      res, message: 'id некорректен', httpStatus: 400
+    });
+
+    return false;
+  }
+
+  return true;
+}
+
+
 module.exports = {
-  setResponse, validateUrl, errorResponse, validateText
+  setResponse, validateUrl, errorResponse, validateText, validateId
 }
