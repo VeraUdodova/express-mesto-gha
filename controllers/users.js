@@ -30,7 +30,7 @@ module.exports.getUsers = (req, res) => {
 };
 
 module.exports.createUser = (req, res) => {
-  // const { name, about, avatar } = req.body;
+  const { name, about, avatar } = req.body;
   // const profile = {};
   // const errors = [];
   //
@@ -57,11 +57,11 @@ module.exports.createUser = (req, res) => {
   // }
 
   // if (errorResponse(res, profile, errors)) {
-    User.create({ name, about, avatar })
-      .then((user) => setResponse({
-        res, messageKey: null, message: user, httpStatus: HTTP_201,
-      }))
-      .catch(() => setResponse({ res, httpStatus: HTTP_500 }));
+  User.create({ name, about, avatar })
+    .then((user) => setResponse({
+      res, messageKey: null, message: user, httpStatus: HTTP_201,
+    }))
+    .catch(() => setResponse({ res, httpStatus: HTTP_500 }));
   // }
 };
 
