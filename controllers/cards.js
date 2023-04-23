@@ -8,7 +8,7 @@ const {
 
 module.exports.getCards = (req, res) => {
   Card.find({})
-    .populate('owner')
+    .populate(['owner', 'likes'])
     .then((cards) => setResponse({ res, messageKey: 'data', message: cards }))
     .catch((errors) => errorResponse(res, errors));
 };
@@ -37,11 +37,14 @@ module.exports.deleteCard = (req, res) => {
     .catch((errors) => errorResponse(res, errors));
 };
 
-module.exports.likeCard = (req, res) => {
+const likeChange = (res, req, like) => {
   const { cardId } = req.params;
+
   Card.findByIdAndUpdate(
     cardId,
-    { $addToSet: { likes: req.user._id } },
+    like
+      ? { $addToSet: { likes: req.user._id } }
+      : { $pull: { likes: req.user._id } },
     { new: true },
   )
     .populate(['owner', 'likes'])
@@ -57,21 +60,10 @@ module.exports.likeCard = (req, res) => {
     .catch((errors) => errorResponse(res, errors));
 };
 
-module.exports.dislikeCard = (req, res) => {
-  const { cardId } = req.params;
+module.exports.likeCard = (req, res) => {
+  likeChange(res, req, true);
+};
 
-  Card.findByIdAndUpdate(
-    cardId,
-    { $pull: { likes: req.user._id } },
-    { new: true },
-  )
-    .populate(['owner', 'likes'])
-    .then((card) => {
-      setResponse(
-        card === null
-          ? { res, message: 'Карточка не найдена', httpStatus: HTTP_404 }
-          : { res, message: card, messageKey: 'data' },
-      );
-    })
-    .catch((errors) => errorResponse(res, errors));
+module.exports.dislikeCard = (req, res) => {
+  likeChange(res, req, false);
 };
