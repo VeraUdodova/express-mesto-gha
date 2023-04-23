@@ -8,6 +8,7 @@ const {
 
 module.exports.getCards = (req, res) => {
   Card.find({})
+    .populate('owner')
     .then((cards) => setResponse({ res, messageKey: 'data', message: cards }))
     .catch((errors) => errorResponse(res, errors));
 };
@@ -43,6 +44,7 @@ module.exports.likeCard = (req, res) => {
     { $addToSet: { likes: req.user._id } },
     { new: true },
   )
+    .populate(['owner', 'likes'])
     .then((card) => {
       setResponse(
         card === null
@@ -63,6 +65,7 @@ module.exports.dislikeCard = (req, res) => {
     { $pull: { likes: req.user._id } },
     { new: true },
   )
+    .populate(['owner', 'likes'])
     .then((card) => {
       setResponse(
         card === null
