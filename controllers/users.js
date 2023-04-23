@@ -1,9 +1,9 @@
 const User = require('../models/user');
 const {
   setResponse,
-  validateText,
-  validateUrl,
-  errorResponse,
+  // validateText,
+  // validateUrl,
+  // errorResponse,
   validateId, HTTP_404, HTTP_500, HTTP_201,
 } = require('../utils/utils');
 
@@ -30,39 +30,39 @@ module.exports.getUsers = (req, res) => {
 };
 
 module.exports.createUser = (req, res) => {
-  const { name, about, avatar } = req.body;
-  const profile = {};
-  const errors = [];
+  // const { name, about, avatar } = req.body;
+  // const profile = {};
+  // const errors = [];
+  //
+  // const nameValidation = validateText(name);
+  // const aboutValidation = validateText(about);
+  // const avatarValidation = validateUrl(avatar);
+  //
+  // if (nameValidation === true) {
+  //   profile.name = name;
+  // } else {
+  //   errors.push(nameValidation);
+  // }
+  //
+  // if (aboutValidation === true) {
+  //   profile.about = about;
+  // } else {
+  //   errors.push(aboutValidation);
+  // }
+  //
+  // if (avatarValidation === true) {
+  //   profile.avatar = avatar;
+  // } else {
+  //   errors.push(avatarValidation);
+  // }
 
-  const nameValidation = validateText(name);
-  const aboutValidation = validateText(about);
-  const avatarValidation = validateUrl(avatar);
-
-  if (nameValidation === true) {
-    profile.name = name;
-  } else {
-    errors.push(nameValidation);
-  }
-
-  if (aboutValidation === true) {
-    profile.about = about;
-  } else {
-    errors.push(aboutValidation);
-  }
-
-  if (avatarValidation === true) {
-    profile.avatar = avatar;
-  } else {
-    errors.push(avatarValidation);
-  }
-
-  if (errorResponse(res, profile, errors)) {
+  // if (errorResponse(res, profile, errors)) {
     User.create({ name, about, avatar })
       .then((user) => setResponse({
         res, messageKey: null, message: user, httpStatus: HTTP_201,
       }))
       .catch(() => setResponse({ res, httpStatus: HTTP_500 }));
-  }
+  // }
 };
 
 const profileUpdateResponse = (res, req, profile) => {
