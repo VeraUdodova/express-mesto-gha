@@ -1,23 +1,24 @@
 const Card = require('../models/card');
+const {setResponse} = require('../utils/utils')
 
 module.exports.getCard = (req, res) => {
   Card.find({})
-    .then(cards => res.send({data: cards}))
-    .catch(() => res.status(500).send({message: 'На сервере произошла ошибка'}))
+    .then(cards => setResponse({res, messageKey: 'data', message: cards}))
+    .catch(() => setResponse({res, httpStatus: 500}))
 }
 
 module.exports.createCard = (req, res) => {
   const {name, link} = req.body;
 
   Card.create({name, link, owner: req.user._id})
-    .then(card => res.send({data: card}))
-    .catch(() => res.status(500).send({message: 'На сервере произошла ошибка'}));
+    .then(card => setResponse({res, messageKey: 'data', message: card}))
+    .catch(() => setResponse({res, httpStatus: 500}))
 }
 
 module.exports.deleteCard = (req, res) => {
   Card.findByIdAndDelete(req.params.cardId)
-    .then(() => res.status(204).send({message: 'Карточка удалена'}))
-    .catch(() => res.status(500).send({message: 'На сервере произошла ошибка'}));
+    .then(() => setResponse({res, message: 'Карточка удалена', httpStatus: 204}))
+    .catch(() => setResponse({res, httpStatus: 500}))
 }
 
 module.exports.likeCard = (req, res) => {
@@ -26,8 +27,8 @@ module.exports.likeCard = (req, res) => {
     {$addToSet: {likes: req.user._id}},
     {new: true}
   )
-    .then(() => res.status(204).send({message: 'Лайк установлен'}))
-    .catch(() => res.status(500).send({message: 'На сервере произошла ошибка'}));
+    .then(() => setResponse({res, message: 'Лайк установлен', httpStatus: 204}))
+    .catch(() => setResponse({res, httpStatus: 500}))
 }
 
 module.exports.dislikeCard = (req, res) => {
@@ -36,6 +37,6 @@ module.exports.dislikeCard = (req, res) => {
     {$pull: {likes: req.user._id}},
     {new: true}
   )
-    .then(() => res.status(204).send({message: 'Лайк удален'}))
-    .catch(() => res.status(500).send({message: 'На сервере произошла ошибка'}));
+    .then(() => setResponse({res, message: 'Лайк удален', httpStatus: 204}))
+    .catch(() => setResponse({res, httpStatus: 500}))
 }
