@@ -48,7 +48,7 @@ module.exports.deleteCard = (req, res) => {
         setResponse(
           card === null ?
             {res, message: 'Карточка не найдена', httpStatus: 404} :
-            {res, message: 'Карточка удалена', httpStatus: 204}
+            {res, message: 'Карточка удалена', httpStatus: 200}
         )
       })
       .catch(() => setResponse({res, httpStatus: 500}))
@@ -68,7 +68,7 @@ module.exports.likeCard = (req, res) => {
         setResponse(
           card === null ?
             {res, message: 'Карточка не найдена', httpStatus: 404} :
-            {res, message: 'Лайк установлен', httpStatus: 204})
+            {res, message: card, messageKey: 'data', httpStatus: 201})
       })
       .catch(() => setResponse({res, httpStatus: 500}))
   }
@@ -87,7 +87,7 @@ module.exports.dislikeCard = (req, res) => {
         setResponse(
           card === null ?
             {res, message: 'Карточка не найдена', httpStatus: 404} :
-            {res, message: 'Лайк удален', httpStatus: 204})
+            {res, message: card, messageKey: 'data', httpStatus: 200})
       })
       .catch(() => setResponse({res, httpStatus: 500}))
   }

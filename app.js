@@ -1,6 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
+const {setResponse} = require('./utils/utils')
 
 const {PORT = 3000} = process.env;
 
@@ -20,6 +21,10 @@ mongoose.connect('mongodb://127.0.0.1:27017/mestodb');
 
 app.use('/users', require('./routes/users'))
 app.use('/cards', require('./routes/cards'))
+
+app.use((req, res) => {
+  setResponse({res, message: 'Страница не найдена', httpStatus: 404})
+})
 
 app.listen(PORT, () => {
   console.log(`App listening on port ${PORT}`)
