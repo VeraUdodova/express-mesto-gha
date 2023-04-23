@@ -4,6 +4,7 @@ const {
   errorResponse,
   HTTP_404,
   HTTP_201,
+  HTTP_200,
 } = require('../utils/utils');
 
 module.exports.getCards = (req, res) => {
@@ -53,7 +54,7 @@ const likeChange = (res, req, like) => {
         card === null
           ? { res, message: 'Карточка не найдена', httpStatus: HTTP_404 }
           : {
-            res, message: card, messageKey: 'data', httpStatus: HTTP_201,
+            res, message: card, messageKey: 'data', httpStatus: like ? HTTP_201 : HTTP_200,
           },
       );
     })
