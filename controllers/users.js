@@ -9,34 +9,90 @@ module.exports.getUser = (req, res) => {
     .catch(() => setResponse({res, httpStatus: 500}))
 }
 
+const validateProfileName = (name) => {
+  if (typeof name !== 'undefined' && name.length >= 2 && name.length <= 30) {
+      return true;
+  }
+
+  return {'error': 'name: не удовлетворят параметрам'}
+}
+const validateProfileAbout = (about) => {
+  if (typeof about !== 'undefined' && about.length >= 2 && about.length <= 30) {
+    return true;
+  }
+
+  return {'error': 'about: не удовлетворят параметрам'}
+}
+const validateProfileAvatar = (avatar) => {
+  if (typeof avatar !== 'undefined' && avatar.length > 0) {
+    return true;
+  }
+
+  return {'error': 'avatar: не удовлетворят параметрам'}
+}
+
 module.exports.createUser = (req, res) => {
   const {name, about, avatar} = req.body;
+  let profile = {};
+  let errors = [];
 
-  User.create({name, about, avatar})
-    .then(user => res.send({data: user}))
-    .catch(() => res.status(500).send({message: 'На сервере произошла ошибка'}));
+  const nameValidation = validateProfileName(name);
+  const aboutValidation = validateProfileAbout(about);
+  const avatarValidation = validateProfileAvatar(avatar)
+
+  if (nameValidation === true) {
+    profile['name'] = name;
+  } else {
+    errors.push(nameValidation['error'])
+  }
+
+  if (aboutValidation === true) {
+    profile['about'] = about;
+  } else {
+    errors.push(aboutValidation['error'])
+  }
+
+  if (avatarValidation === true) {
+    profile['avatar'] = avatar;
+  } else {
+    errors.push(avatarValidation['error'])
+  }
+
+  if (profileErrors(res, profile, errors)) {
+    User.create({name, about, avatar})
+      .then(user => res.send({data: user}))
+      .catch(() => setResponse({res, httpStatus: 500}));
+  }
 };
 
-const profileUpdateResponse = (res, req, profile, errors) => {
+const profileErrors = (res, profile, errors) => {
   if (Object.keys(profile).length === 0) {
     errors.push('Ничего не передано')
   }
 
   if (errors.length > 0) {
-    return setResponse({
+    setResponse({
       res: res,
       message: errors,
       httpStatus: 400
     })
+
+    return false
   }
 
-  User.findByIdAndUpdate(req.user._id, profile)
-    .then((user) => setResponse({
-      res,
-      messageKey: 'user',
-      message: user
-    }))
-    .catch(() => setResponse({res, httpStatus: 500}))
+  return true
+}
+
+const profileUpdateResponse = (res, req, profile, errors) => {
+  if (profileErrors(res, profile, errors)) {
+    User.findByIdAndUpdate(req.user._id, profile)
+      .then((user) => setResponse({
+        res,
+        messageKey: 'user',
+        message: user
+      }))
+      .catch(() => setResponse({res, httpStatus: 500}))
+  }
 }
 
 module.exports.updateUser = (req, res) => {
@@ -44,19 +100,19 @@ module.exports.updateUser = (req, res) => {
   let profile = {};
   let errors = [];
 
-  if (typeof name !== 'undefined') {
-    if (name.length >= 2 && name.length <= 30) {
-      profile['name'] = name;
-    } else {
-      errors.push('name: не удовлетворят параметрам')
-    }
+  const nameValidation = validateProfileName(name);
+  const aboutValidation = validateProfileAbout(about);
+
+  if (nameValidation === true) {
+    profile['name'] = name;
+  } else {
+    errors.push(nameValidation['error'])
   }
-  if (typeof about !== 'undefined') {
-    if (about.length >= 2 && about.length <= 30) {
-      profile['about'] = about;
-    } else {
-      errors.push('about: не удовлетворят параметрам')
-    }
+
+  if (aboutValidation === true) {
+    profile['about'] = about;
+  } else {
+    errors.push(aboutValidation['error'])
   }
 
   profileUpdateResponse(res, req, profile, errors)
@@ -67,12 +123,12 @@ module.exports.updateAvatar = (req, res) => {
   let profile = {};
   let errors = [];
 
-  if (typeof avatar != 'undefined') {
-    if (avatar.length > 0) {
-      profile.avatar = avatar;
-    } else {
-      errors.push('avatar: не удовлетворят параметрам')
-    }
+  const avatarValidation = validateProfileAvatar(avatar)
+
+  if (avatarValidation === true) {
+    profile['avatar'] = avatar;
+  } else {
+    errors.push(avatarValidation['error'])
   }
 
   profileUpdateResponse(res, req, profile, errors)
