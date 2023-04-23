@@ -27,11 +27,8 @@ module.exports.createCard = (req, res) => {
   }
 
   if (errorResponse(res, profile, errors)) {
-    Card.create(
-      {name, link, owner: req.user._id},
-      {new: true, runValidators: true}
-    )
-      .then(card => setResponse({res, messageKey: 'data', message: card}))
+    Card.create({name, link, owner: req.user._id})
+      .then(card => setResponse({res, messageKey: 'id', message: card._id, httpStatus: 201}))
       .catch(() => setResponse({res, httpStatus: 500}))
   }
 }

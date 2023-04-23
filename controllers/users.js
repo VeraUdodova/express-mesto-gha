@@ -59,11 +59,8 @@ module.exports.createUser = (req, res) => {
   }
 
   if (errorResponse(res, profile, errors)) {
-    User.create(
-      {name, about, avatar},
-      {new: true, runValidators: true}
-    )
-      .then(user => setResponse({res, messageKey: 'data', message: user}))
+    User.create({name, about, avatar})
+      .then(user => setResponse({res, messageKey: 'id', message: user._id, httpStatus: 201}))
       .catch(() => setResponse({res, httpStatus: 500}));
   }
 };
