@@ -18,6 +18,15 @@ app.use((req, res, next) => {
 
 mongoose.connect('mongodb://127.0.0.1:27017/mestodb');
 
+app.use((err, req, res, next) => {
+  const { statusCode = 500, message } = err;
+  return res.status(statusCode).send({
+    message: statusCode === 500
+      ? 'На сервере произошла ошибка'
+      : message,
+  });
+});
+
 app.use('/users', require('./routes/users'));
 app.use('/cards', require('./routes/cards'));
 
@@ -25,4 +34,5 @@ app.use((req, res) => {
   setResponse({ res, message: 'Страница не найдена', httpStatus: HTTP_404 });
 });
 
-app.listen(PORT, () => {});
+app.listen(PORT, () => {
+});

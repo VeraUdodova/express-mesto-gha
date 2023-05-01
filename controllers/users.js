@@ -1,22 +1,23 @@
 const User = require('../models/user');
+const NotFoundError = require('../errors/not-found-err');
 const {
   setResponse,
   errorResponse,
   HTTP_404, HTTP_201,
 } = require('../utils/utils');
 
-module.exports.getUser = (req, res) => {
+module.exports.getUser = (req, res, next) => {
   const { userId } = req.params;
 
   User.findById(userId)
     .then((user) => {
-      setResponse(
-        user === null
-          ? { res, message: 'Пользователь не найден', httpStatus: HTTP_404 }
-          : { res, messageKey: 'data', message: user },
-      );
+      if (user === null) {
+        throw new NotFoundError('Пользователь не найден');
+      }
+
+      setResponse({ res, messageKey: 'data', message: user });
     })
-    .catch((errors) => errorResponse(res, errors));
+    .catch(next);
 };
 
 module.exports.getUsers = (req, res) => {
