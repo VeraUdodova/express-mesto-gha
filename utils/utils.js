@@ -1,6 +1,7 @@
 const HTTP_200 = 200;
 const HTTP_201 = 201;
 const HTTP_400 = 400;
+const HTTP_401 = 401;
 const HTTP_404 = 404;
 const HTTP_500 = 500;
 
