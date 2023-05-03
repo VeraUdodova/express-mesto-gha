@@ -1,44 +1,43 @@
 const Card = require('../models/card');
+const NotFoundError = require('../errors/not-found-err');
 const {
   setResponse,
-  errorResponse,
-  HTTP_404,
   HTTP_201,
   HTTP_200,
 } = require('../utils/utils');
 
-module.exports.getCards = (req, res) => {
+module.exports.getCards = (req, res, next) => {
   Card.find({})
     .populate(['owner', 'likes'])
     .then((cards) => setResponse({ res, messageKey: 'data', message: cards }))
-    .catch((errors) => errorResponse(res, errors));
+    .catch(next);
 };
 
-module.exports.createCard = (req, res) => {
+module.exports.createCard = (req, res, next) => {
   const { name, link } = req.body;
 
   Card.create({ name, link, owner: req.user._id })
     .then((card) => setResponse({
       res, messageKey: null, message: card, httpStatus: HTTP_201,
     }))
-    .catch((errors) => errorResponse(res, errors));
+    .catch(next);
 };
 
-module.exports.deleteCard = (req, res) => {
+module.exports.deleteCard = (req, res, next) => {
   const { cardId } = req.params;
 
   Card.findByIdAndDelete(cardId)
     .then((card) => {
-      setResponse(
-        card === null
-          ? { res, message: 'Карточка не найдена', httpStatus: HTTP_404 }
-          : { res, message: 'Карточка удалена' },
-      );
+      if (card === null) {
+        throw new NotFoundError('Карточка не найдена');
+      }
+
+      setResponse({ res, message: 'Карточка удалена' });
     })
-    .catch((errors) => errorResponse(res, errors));
+    .catch(next);
 };
 
-const likeChange = (res, req, like) => {
+const likeChange = (res, req, next, like) => {
   const { cardId } = req.params;
 
   Card.findByIdAndUpdate(
@@ -50,21 +49,21 @@ const likeChange = (res, req, like) => {
   )
     .populate(['owner', 'likes'])
     .then((card) => {
-      setResponse(
-        card === null
-          ? { res, message: 'Карточка не найдена', httpStatus: HTTP_404 }
-          : {
-            res, message: card, messageKey: 'data', httpStatus: like ? HTTP_201 : HTTP_200,
-          },
-      );
+      if (card === null) {
+        throw new NotFoundError('Карточка не найдена');
+      }
+
+      setResponse({
+        res, message: card, messageKey: 'data', httpStatus: like ? HTTP_201 : HTTP_200,
+      });
     })
-    .catch((errors) => errorResponse(res, errors));
+    .catch(next);
 };
 
-module.exports.likeCard = (req, res) => {
-  likeChange(res, req, true);
+module.exports.likeCard = (req, res, next) => {
+  likeChange(res, req, next, true);
 };
 
-module.exports.dislikeCard = (req, res) => {
-  likeChange(res, req, false);
+module.exports.dislikeCard = (req, res, next) => {
+  likeChange(res, req, next, false);
 };

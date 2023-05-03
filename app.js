@@ -1,7 +1,9 @@
 /* eslint no-unused-vars: "error" */
 const express = require('express');
 const mongoose = require('mongoose');
-const { setResponse, HTTP_404 } = require('./utils/utils');
+const {
+  setResponse, HTTP_404, HTTP_400, HTTP_500,
+} = require('./utils/utils');
 
 const { PORT = 3000 } = process.env;
 
@@ -27,12 +29,24 @@ app.use((req, res) => {
 });
 
 app.use((err, req, res, next) => {
-  const { statusCode = 500, message } = err;
-  res.status(statusCode).send({
-    message: statusCode === 500
-      ? 'На сервере произошла ошибка'
-      : message,
-  });
+  let { statusCode = HTTP_500, message } = err;
+
+  if (err instanceof mongoose.Error.ValidationError) {
+    statusCode = HTTP_400;
+  } else if (err instanceof mongoose.Error.CastError) {
+    statusCode = HTTP_400;
+    message = 'id некорректен';
+  }
+
+  res
+    .status(statusCode)
+    .send({
+      message: statusCode === HTTP_500
+        ? 'На сервере произошла ошибка'
+        : message,
+    });
+
+  next();
 });
 
 app.listen(PORT, () => {

@@ -2,8 +2,7 @@ const User = require('../models/user');
 const NotFoundError = require('../errors/not-found-err');
 const {
   setResponse,
-  errorResponse,
-  HTTP_404, HTTP_201,
+  HTTP_201,
 } = require('../utils/utils');
 
 module.exports.getUser = (req, res, next) => {
@@ -20,23 +19,23 @@ module.exports.getUser = (req, res, next) => {
     .catch(next);
 };
 
-module.exports.getUsers = (req, res) => {
+module.exports.getUsers = (req, res, next) => {
   User.find({})
     .then((users) => setResponse({ res, messageKey: 'data', message: users }))
-    .catch((errors) => errorResponse(res, errors));
+    .catch(next);
 };
 
-module.exports.createUser = (req, res) => {
+module.exports.createUser = (req, res, next) => {
   const { name, about, avatar } = req.body;
 
   User.create({ name, about, avatar })
     .then((user) => setResponse({
       res, messageKey: null, message: user, httpStatus: HTTP_201,
     }))
-    .catch((errors) => errorResponse(res, errors));
+    .catch(next);
 };
 
-const profileUpdateResponse = (res, req, profile) => {
+const profileUpdateResponse = (res, req, next, profile) => {
   const userId = req.user._id;
 
   User.findByIdAndUpdate(
@@ -44,22 +43,24 @@ const profileUpdateResponse = (res, req, profile) => {
     profile,
     { new: true, runValidators: true },
   )
-    .then((user) => setResponse(
-      user === null
-        ? { res, message: 'Пользователь не найден', httpStatus: HTTP_404 }
-        : { res, messageKey: 'user', message: user },
-    ))
-    .catch((errors) => errorResponse(res, errors));
+    .then((user) => {
+      if (user === null) {
+        throw new NotFoundError('Пользователь не найден');
+      }
+
+      setResponse({ res, messageKey: 'user', message: user });
+    })
+    .catch(next);
 };
 
-module.exports.updateUser = (req, res) => {
+module.exports.updateUser = (req, res, next) => {
   const { name, about } = req.body;
 
-  profileUpdateResponse(res, req, { name, about });
+  profileUpdateResponse(res, req, next, { name, about });
 };
 
-module.exports.updateAvatar = (req, res) => {
+module.exports.updateAvatar = (req, res, next) => {
   const { avatar } = req.body;
 
-  profileUpdateResponse(res, req, { avatar });
+  profileUpdateResponse(res, req, next, { avatar });
 };

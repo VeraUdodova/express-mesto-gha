@@ -1,5 +1,3 @@
-const mongoose = require('mongoose');
-
 const HTTP_200 = 200;
 const HTTP_201 = 201;
 const HTTP_400 = 400;
@@ -29,27 +27,8 @@ const setResponse = (
   return res.status(httpStatus).send(result);
 };
 
-const errorResponse = (res, errors) => {
-  let httpStatus = HTTP_500;
-  let { message } = errors;
-
-  if (errors instanceof mongoose.Error.ValidationError) {
-    httpStatus = HTTP_400;
-  } else if (errors instanceof mongoose.Error.CastError) {
-    httpStatus = HTTP_400;
-    message = 'id некорректен';
-  }
-
-  setResponse({
-    res,
-    message,
-    httpStatus,
-  });
-};
-
 module.exports = {
   setResponse,
-  errorResponse,
   HTTP_404,
   HTTP_200,
   HTTP_400,
