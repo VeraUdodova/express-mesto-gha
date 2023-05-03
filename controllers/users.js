@@ -1,5 +1,8 @@
 const User = require('../models/user');
+const validator = require('validator').default;
+const bcrypt = require('bcryptjs');
 const NotFoundError = require('../errors/not-found-err');
+const ValidationError = require('../errors/validation-err')
 const {
   setResponse,
   HTTP_201,
@@ -26,13 +29,18 @@ module.exports.getUsers = (req, res, next) => {
 };
 
 module.exports.createUser = (req, res, next) => {
-  const { name, about, avatar } = req.body;
+  const { name, about, avatar, email, password } = req.body;
 
-  User.create({ name, about, avatar })
-    .then((user) => setResponse({
-      res, messageKey: null, message: user, httpStatus: HTTP_201,
-    }))
-    .catch(next);
+  if (email && validator.isEmail(email)) {
+    bcrypt.hash(password, 10)
+      .then((hash) => User.create({ name, about, avatar, email, password:hash })
+        .then((user) => setResponse({
+          res, messageKey: null, message: user, httpStatus: HTTP_201,
+        }))
+        .catch(next));
+  } else {
+    throw new ValidationError('Неверный email')
+  }
 };
 
 const profileUpdateResponse = (res, req, next, profile) => {
