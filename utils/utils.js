@@ -30,9 +30,10 @@ const setResponse = (
 
 module.exports = {
   setResponse,
-  HTTP_404,
   HTTP_200,
-  HTTP_400,
-  HTTP_500,
   HTTP_201,
+  HTTP_400,
+  HTTP_401,
+  HTTP_404,
+  HTTP_500,
 };

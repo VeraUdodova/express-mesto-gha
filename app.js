@@ -1,6 +1,8 @@
-/* eslint no-unused-vars: "error" */
 const express = require('express');
 const mongoose = require('mongoose');
+const {
+  createUser, login,
+} = require('./controllers/users');
 const {
   setResponse, HTTP_404, HTTP_400, HTTP_500,
 } = require('./utils/utils');
@@ -24,6 +26,9 @@ mongoose.connect('mongodb://127.0.0.1:27017/mestodb');
 app.use('/users', require('./routes/users'));
 app.use('/cards', require('./routes/cards'));
 
+app.use('/signup', login);
+app.use('/signin', createUser);
+
 app.use((req, res) => {
   setResponse({ res, message: 'Страница не найдена', httpStatus: HTTP_404 });
 });
@@ -35,7 +40,7 @@ app.use((err, req, res, next) => {
     statusCode = HTTP_400;
   } else if (err instanceof mongoose.Error.CastError) {
     statusCode = HTTP_400;
-    message = 'id некорректен';
+    message = 'запрос некорректен';
   }
 
   res
