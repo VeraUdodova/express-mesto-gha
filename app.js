@@ -14,14 +14,21 @@ const app = express();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use((req, res, next) => {
+  req.user = {
+    _id: '644392bfbf64737d49e63f34', // вставьте сюда _id созданного в предыдущем пункте пользователя
+  };
+
+  next();
+});
 
 mongoose.connect('mongodb://127.0.0.1:27017/mestodb');
 
-app.use('/signup', login);
-app.use('/signin', createUser);
-
 app.use('/users', auth, require('./routes/users'));
 app.use('/cards', auth, require('./routes/cards'));
+
+app.use('/signup', login);
+app.use('/signin', createUser);
 
 app.use((req, res) => {
   setResponse({ res, message: 'Страница не найдена', httpStatus: HTTP_404 });

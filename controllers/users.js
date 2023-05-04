@@ -11,7 +11,7 @@ const {
   HTTP_201,
 } = require('../utils/utils');
 
-module.exports.getUser = (req, res, next) => {
+const getUser = (req, res, next) => {
   const { userId } = req.params;
 
   User.findById(userId)
@@ -25,7 +25,7 @@ module.exports.getUser = (req, res, next) => {
     .catch(next);
 };
 
-module.exports.getMe = (req, res, next) => {
+const getMe = (req, res, next) => {
   const { userId } = req.user._id;
 
   User.findById(userId)
@@ -39,13 +39,13 @@ module.exports.getMe = (req, res, next) => {
     .catch(next);
 };
 
-module.exports.getUsers = (req, res, next) => {
+const getUsers = (req, res, next) => {
   User.find({})
     .then((users) => setResponse({ res, messageKey: 'data', message: users }))
     .catch(next);
 };
 
-module.exports.createUser = (req, res, next) => {
+const createUser = (req, res, next) => {
   const {
     name, about, avatar, email, password,
   } = req.body;
@@ -78,19 +78,19 @@ const profileUpdateResponse = (res, req, next, profile) => {
     .catch(next);
 };
 
-module.exports.updateUser = (req, res, next) => {
+const updateUser = (req, res, next) => {
   const { name, about } = req.body;
 
   profileUpdateResponse(res, req, next, { name, about });
 };
 
-module.exports.updateAvatar = (req, res, next) => {
+const updateAvatar = (req, res, next) => {
   const { avatar } = req.body;
 
   profileUpdateResponse(res, req, next, { avatar });
 };
 
-module.exports.login = (req, res, next) => {
+const login = (req, res, next) => {
   const { email, password } = req.body;
 
   return User.findUserByCredentials(email, password)
@@ -114,4 +114,11 @@ module.exports.login = (req, res, next) => {
 
 module.exports = {
   SECRET,
+  getMe,
+  createUser,
+  updateUser,
+  login,
+  getUsers,
+  getUser,
+  updateAvatar,
 };
