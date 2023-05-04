@@ -55,7 +55,13 @@ const createUser = (req, res, next) => {
       name, about, avatar, email, password: hash,
     })
       .then((user) => setResponse({
-        res, messageKey: null, message: user, httpStatus: HTTP_201,
+        res, messageKey: null, message: {
+          _id: user.id,
+          name: user.name,
+          about: user.about,
+          avatar: user.avatar,
+          email: user.email
+        }, httpStatus: HTTP_201,
       }))
       .catch(next));
 };
