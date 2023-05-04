@@ -25,6 +25,20 @@ module.exports.getUser = (req, res, next) => {
     .catch(next);
 };
 
+module.exports.getMe = (req, res, next) => {
+  const { userId } = req.user._id;
+
+  User.findById(userId)
+    .then((user) => {
+      if (user === null) {
+        throw new NotFoundError('Пользователь не найден');
+      }
+
+      setResponse({ res, messageKey: 'data', message: user });
+    })
+    .catch(next);
+};
+
 module.exports.getUsers = (req, res, next) => {
   User.find({})
     .then((users) => setResponse({ res, messageKey: 'data', message: users }))
