@@ -1,6 +1,6 @@
 const Card = require('../models/card');
 const NotFoundError = require('../errors/not-found-err');
-const NotAuthorizedError = require('../errors/not-authorized')
+const NotAuthorizedError = require('../errors/not-authorized');
 const {
   setResponse,
   HTTP_201,
@@ -13,7 +13,7 @@ module.exports.getCards = (req, res, next) => {
     .then((cards) => setResponse({
       res,
       messageKey: 'data',
-      message: cards
+      message: cards,
     }))
     .catch(next);
 };
@@ -38,7 +38,7 @@ module.exports.deleteCard = (req, res, next) => {
       }
 
       if (card.user._id !== req.params.user._id) {
-        throw new NotAuthorizedError('Вы не можете удалить чужую карточку')
+        throw new NotAuthorizedError('Вы не можете удалить чужую карточку');
       }
 
       setResponse({ res, message: 'Карточка удалена' });

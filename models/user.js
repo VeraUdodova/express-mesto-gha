@@ -23,11 +23,11 @@ const userSchema = new mongoose.Schema({
     required: true,
     default: 'https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png',
     validate: {
-      validator: function (v) {
-        return /https?:\/\/(?:|www.?)[0-9a-z\-._~:\/?#\[\]@!$&'()*+,;=]+#?/.test(v);
+      validator(v) {
+        return /https?:\/\/(?:|www.?)[0-9a-z\-._~:/?#[\]@!$&'()*+,;=]+#?/.test(v);
       },
       message: 'Неправильный формат ссылки',
-    }
+    },
   },
   email: {
     type: String,
@@ -42,27 +42,25 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
     minlength: 8,
-    select: false
+    select: false,
   },
 });
 
-userSchema.statics.findUserByCredentials = function (email, password) {
-  return this.findOne({ email })
-    .select('+password')
-    .then((user) => {
-      if (!user) {
-        return Promise.reject(new NotAuthorizedError('Неправильные почта или пароль'));
-      }
+userSchema.statics.findUserByCredentials = (email, password) => this.findOne({ email })
+  .select('+password')
+  .then((user) => {
+    if (!user) {
+      return Promise.reject(new NotAuthorizedError('Неправильные почта или пароль'));
+    }
 
-      return bcrypt.compare(password, user.password)
-        .then((matched) => {
-          if (!matched) {
-            return Promise.reject(new NotAuthorizedError('Неправильные почта или пароль'));
-          }
+    return bcrypt.compare(password, user.password)
+      .then((matched) => {
+        if (!matched) {
+          return Promise.reject(new NotAuthorizedError('Неправильные почта или пароль'));
+        }
 
-          return user;
-        });
-    });
-};
+        return user;
+      });
+  });
 
 module.exports = mongoose.model('user', userSchema);
