@@ -1,5 +1,6 @@
 const Card = require('../models/card');
 const NotFoundError = require('../errors/not-found-err');
+const NotAuthorizedError = require('../errors/not-authorized')
 const {
   setResponse,
   HTTP_201,
@@ -9,7 +10,11 @@ const {
 module.exports.getCards = (req, res, next) => {
   Card.find({})
     .populate(['owner', 'likes'])
-    .then((cards) => setResponse({ res, messageKey: 'data', message: cards }))
+    .then((cards) => setResponse({
+      res,
+      messageKey: 'data',
+      message: cards
+    }))
     .catch(next);
 };
 
@@ -30,6 +35,10 @@ module.exports.deleteCard = (req, res, next) => {
     .then((card) => {
       if (card === null) {
         throw new NotFoundError('Карточка не найдена');
+      }
+
+      if (card.user._id !== req.params.user._id) {
+        throw new NotAuthorizedError('Вы не можете удалить чужую карточку')
       }
 
       setResponse({ res, message: 'Карточка удалена' });
