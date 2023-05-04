@@ -97,3 +97,7 @@ module.exports.login = (req, res, next) => {
     })
     .catch(next);
 };
+
+module.exports = {
+  SECRET,
+};

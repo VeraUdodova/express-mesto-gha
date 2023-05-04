@@ -6,6 +6,7 @@ const {
 const {
   setResponse, HTTP_404, HTTP_400, HTTP_500,
 } = require('./utils/utils');
+const auth = require('./middlewares/auth');
 
 const { PORT = 3000 } = process.env;
 
@@ -23,11 +24,11 @@ app.use((req, res, next) => {
 
 mongoose.connect('mongodb://127.0.0.1:27017/mestodb');
 
-app.use('/users', require('./routes/users'));
-app.use('/cards', require('./routes/cards'));
-
 app.use('/signup', login);
 app.use('/signin', createUser);
+
+app.use('/users', auth, require('./routes/users'));
+app.use('/cards', auth, require('./routes/cards'));
 
 app.use((req, res) => {
   setResponse({ res, message: 'Страница не найдена', httpStatus: HTTP_404 });
