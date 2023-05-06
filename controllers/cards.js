@@ -34,20 +34,21 @@ module.exports.deleteCard = (req, res, next) => {
 
   Card.findById(cardId)
     .then((card) => {
-      if (card === null) {
+      if (!card) {
         throw new NotFoundError('Карточка не найдена');
       }
 
-      if (card.owner._id.toString() !== req.user._id) {
+      if (card.owner.toString() !== req.user._id) {
         throw new NotAuthorizedError('Вы не можете удалить чужую карточку');
       }
 
-      Card.deleteOne(cardId)
+      Card.deleteOne({ _id: cardId })
         .then(() => {
           setResponse({ res, message: 'Карточка удалена' });
         })
         .catch(next);
-    });
+    })
+    .catch(next);
 };
 
 const likeChange = (res, req, next, like) => {
