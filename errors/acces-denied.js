@@ -1,7 +1,7 @@
 const { HTTP_403 } = require('../utils/utils');
 
 class AccessDeniedError extends Error {
-  constructor(message) {
+  constructor(message = 'Доступ запрещен') {
     super(message);
     this.statusCode = HTTP_403;
   }

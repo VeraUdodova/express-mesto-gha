@@ -3,7 +3,7 @@ const { SECRET } = require('../controllers/users');
 const NotAuthorizedError = require('../errors/not-authorized');
 
 const handleAuthError = () => {
-  throw new NotAuthorizedError('Необходима авторизация');
+  throw new NotAuthorizedError();
 };
 
 const extractBearerToken = (header) => header.replace('Bearer ', '');

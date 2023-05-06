@@ -37,7 +37,7 @@ const errorHandler = (err, req, res, next) => {
     statusCode = HTTP_400;
   } else if (err instanceof mongoose.Error.CastError) {
     statusCode = HTTP_400;
-    message = 'запрос некорректен';
+    message = 'Запрос некорректен';
   } else if (err.code === 11000) {
     statusCode = HTTP_409;
     message = 'Такой пользователь уже есть';

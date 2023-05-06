@@ -6,12 +6,11 @@ const { errorHandler } = require('./utils/utils');
 const NotFoundError = require('./errors/not-found-err');
 const auth = require('./middlewares/auth');
 const { signupValidator, signinValidator } = require('./validators/users');
-
-const { PORT = 3000 } = process.env;
+const { PORT, DB } = require('./config');
 
 const app = express();
 
-mongoose.connect('mongodb://127.0.0.1:27017/mestodb1');
+mongoose.connect(DB);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -21,7 +20,7 @@ app.use('/users', auth, require('./routes/users'));
 app.use('/cards', auth, require('./routes/cards'));
 
 app.use('/', (req, res, next) => {
-  next(new NotFoundError('Страница не найдена'));
+  next(new NotFoundError());
 });
 app.use(errors());
 app.use(errorHandler);

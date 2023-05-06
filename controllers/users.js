@@ -3,8 +3,7 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 const NotFoundError = require('../errors/not-found-err');
 const NotAuthorizedError = require('../errors/not-authorized');
-
-const { SECRET = 'U1S52@gT5]ECPZ::F|q^hC##gl{ocRG$vh*!5F/yFAt6wHGFchBud@e.aros#SJ' } = process.env;
+const { SECRET } = require('../config');
 
 const {
   setResponse,
@@ -109,14 +108,13 @@ const login = (req, res, next) => {
       }
       const token = jwt.sign({ _id: user._id }, SECRET, { expiresIn: '7d' });
 
-      // вернём токен
       res
         .cookie('jwt', token, {
           maxAge: 3600000 * 24 * 7,
           httpOnly: true,
           sameSite: true,
         })
-        .send({ token });
+        .send();
     })
     .catch(next);
 };
