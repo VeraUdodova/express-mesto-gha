@@ -1,6 +1,7 @@
 const Card = require('../models/card');
 const NotFoundError = require('../errors/not-found-err');
 const NotAuthorizedError = require('../errors/not-authorized');
+const AccessDeniedError = require('../errors/acces-denied');
 const {
   setResponse,
   HTTP_201,
@@ -62,8 +63,12 @@ const likeChange = (res, req, next, like) => {
         throw new NotFoundError('Карточка не найдена');
       }
 
+      if (card.owner._id !== req.user._id) {
+        throw new AccessDeniedError('Вы не можете удалить чужую карточку');
+      }
+
       setResponse({
-        res, message: card, messageKey: 'data', httpStatus: like ? HTTP_201 : HTTP_200,
+        res, message: card, messageKey: 'data', httpStatus: HTTP_200,
       });
     })
     .catch(next);

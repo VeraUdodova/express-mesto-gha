@@ -26,7 +26,7 @@ const getUser = (req, res, next) => {
 };
 
 const getMe = (req, res, next) => {
-  const { userId } = req.user._id;
+  const userId = req.user._id;
 
   User.findById(userId)
     .then((user) => {
@@ -45,7 +45,7 @@ const getUsers = (req, res, next) => {
     .catch(next);
 };
 
-const createUser = (req, res, next) => {
+const registration = (req, res, next) => {
   const {
     name, about, avatar, email, password,
   } = req.body;
@@ -55,13 +55,16 @@ const createUser = (req, res, next) => {
       name, about, avatar, email, password: hash,
     })
       .then((user) => setResponse({
-        res, messageKey: null, message: {
+        res,
+        messageKey: null,
+        message: {
           _id: user.id,
           name: user.name,
           about: user.about,
           avatar: user.avatar,
-          email: user.email
-        }, httpStatus: HTTP_201,
+          email: user.email,
+        },
+        httpStatus: HTTP_201,
       }))
       .catch(next));
 };
@@ -121,7 +124,7 @@ const login = (req, res, next) => {
 module.exports = {
   SECRET,
   getMe,
-  createUser,
+  registration,
   updateUser,
   login,
   getUsers,
