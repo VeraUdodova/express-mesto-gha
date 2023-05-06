@@ -19,9 +19,7 @@ const setResponse = (
 ) => {
   let result;
 
-  if (httpStatus === HTTP_500) {
-    result = { [messageKey]: 'На сервере произошла ошибка' };
-  } else if (messageKey === 'message' && typeof message !== 'string') {
+  if (messageKey === 'message' && typeof message !== 'string') {
     result = { [messageKey]: message.join('\n') };
   } else if (messageKey == null) {
     result = message;

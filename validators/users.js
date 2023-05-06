@@ -28,14 +28,14 @@ module.exports.validateUserIdParam = celebrate({
 
 module.exports.validateUpdateUserBody = celebrate({
   body: Joi.object().keys({
-    name: Joi.string().min(2).max(30),
-    about: Joi.string().min(2).max(30),
+    name: Joi.string().required().min(2).max(30),
+    about: Joi.string().required().min(2).max(30),
   }),
 });
 
 module.exports.validateUpdateAvatarBody = celebrate({
   body: Joi.object().keys({
-    avatar: Joi.string().regex(
+    avatar: Joi.string().required().regex(
       urlRegExp,
     ),
   }),
