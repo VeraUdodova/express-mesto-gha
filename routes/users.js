@@ -7,7 +7,7 @@ const { validateUpdateUserBody, validateUpdateAvatarBody, validateUserIdParam } 
 router.get('/', getUsers);
 router.get('/me', getMe);
 router.get('/:userId', validateUserIdParam, getUser);
-router.patch('/me', validateUpdateAvatarBody, updateUser);
-router.patch('/me/avatar', validateUpdateUserBody, updateAvatar);
+router.patch('/me', validateUpdateUserBody, updateUser);
+router.patch('/me/avatar', validateUpdateAvatarBody, updateAvatar);
 
 module.exports = router;

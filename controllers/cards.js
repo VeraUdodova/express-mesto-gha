@@ -32,19 +32,22 @@ module.exports.createCard = (req, res, next) => {
 module.exports.deleteCard = (req, res, next) => {
   const { cardId } = req.params;
 
-  Card.findByIdAndDelete(cardId)
+  Card.findById(cardId)
     .then((card) => {
       if (card === null) {
         throw new NotFoundError('Карточка не найдена');
       }
 
-      if (card.user._id !== req.params.user._id) {
+      if (card.owner._id.toString() !== req.user._id) {
         throw new NotAuthorizedError('Вы не можете удалить чужую карточку');
       }
 
-      setResponse({ res, message: 'Карточка удалена' });
+      Card.deleteOne(cardId)
+        .then((card) => {
+          setResponse({res, message: 'Карточка удалена'});
+        })
+        .catch(next);
     })
-    .catch(next);
 };
 
 const likeChange = (res, req, next, like) => {
@@ -63,12 +66,12 @@ const likeChange = (res, req, next, like) => {
         throw new NotFoundError('Карточка не найдена');
       }
 
-      if (card.owner._id !== req.user._id) {
+      if (card.owner._id.toString() !== req.user._id) {
         throw new AccessDeniedError('Вы не можете удалить чужую карточку');
       }
 
       setResponse({
-        res, message: card, messageKey: 'data', httpStatus: HTTP_200,
+        res, message: card, messageKey: 'data', httpStatus: like ? HTTP_201 : HTTP_200,
       });
     })
     .catch(next);
