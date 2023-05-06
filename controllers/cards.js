@@ -41,7 +41,7 @@ module.exports.deleteCard = (req, res, next) => {
         throw new AccessDeniedError('Вы не можете удалить чужую карточку');
       }
 
-      Card.deleteOne({ _id: cardId })
+      card.deleteOne()
         .then(() => {
           setResponse({ res, message: 'Карточка удалена' });
         })

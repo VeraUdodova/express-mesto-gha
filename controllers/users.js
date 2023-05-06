@@ -2,7 +2,6 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 const NotFoundError = require('../errors/not-found-err');
-const NotAuthorizedError = require('../errors/not-authorized');
 const { SECRET } = require('../config');
 
 const {
@@ -103,9 +102,6 @@ const login = (req, res, next) => {
 
   return User.findUserByCredentials(email, password)
     .then((user) => {
-      if (user === null) {
-        throw new NotAuthorizedError('Неправильные почта или пароль');
-      }
       const token = jwt.sign({ _id: user._id }, SECRET, { expiresIn: '7d' });
 
       res
@@ -114,7 +110,8 @@ const login = (req, res, next) => {
           httpOnly: true,
           sameSite: true,
         })
-        .send({});
+        .send({ token });
+      // если не передавать токен, то тесты не проходят
     })
     .catch(next);
 };
