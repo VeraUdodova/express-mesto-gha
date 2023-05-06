@@ -1,6 +1,5 @@
 const Card = require('../models/card');
 const NotFoundError = require('../errors/not-found-err');
-const NotAuthorizedError = require('../errors/not-authorized');
 const AccessDeniedError = require('../errors/acces-denied');
 const {
   setResponse,
@@ -39,7 +38,7 @@ module.exports.deleteCard = (req, res, next) => {
       }
 
       if (card.owner.toString() !== req.user._id) {
-        throw new NotAuthorizedError('Вы не можете удалить чужую карточку');
+        throw new AccessDeniedError('Вы не можете удалить чужую карточку');
       }
 
       Card.deleteOne({ _id: cardId })
@@ -65,10 +64,6 @@ const likeChange = (res, req, next, like) => {
     .then((card) => {
       if (card === null) {
         throw new NotFoundError('Карточка не найдена');
-      }
-
-      if (card.owner._id.toString() !== req.user._id) {
-        throw new AccessDeniedError('Вы не можете удалить чужую карточку');
       }
 
       setResponse({
