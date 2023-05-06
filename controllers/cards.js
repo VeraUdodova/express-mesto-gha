@@ -43,11 +43,11 @@ module.exports.deleteCard = (req, res, next) => {
       }
 
       Card.deleteOne(cardId)
-        .then((card) => {
-          setResponse({res, message: 'Карточка удалена'});
+        .then(() => {
+          setResponse({ res, message: 'Карточка удалена' });
         })
         .catch(next);
-    })
+    });
 };
 
 const likeChange = (res, req, next, like) => {
