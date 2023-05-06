@@ -20,8 +20,8 @@ app.use('/signup', signupValidator, registration);
 app.use('/users', auth, require('./routes/users'));
 app.use('/cards', auth, require('./routes/cards'));
 
-app.use('/', () => {
-  throw new NotFoundError('Страница не найдена');
+app.use('/', (req, res, next) => {
+  next(new NotFoundError('Страница не найдена'));
 });
 app.use(errors());
 app.use(errorHandler);
