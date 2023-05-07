@@ -9,9 +9,7 @@ const {
   HTTP_201,
 } = require('../utils/utils');
 
-const getUser = (req, res, next) => {
-  const { userId } = req.params;
-
+const findUserById = (req, res, next, userId) => {
   User.findById(userId)
     .then((user) => {
       if (user === null) {
@@ -23,18 +21,30 @@ const getUser = (req, res, next) => {
     .catch(next);
 };
 
-const getMe = (req, res, next) => {
+const profileUpdateResponse = (res, req, next, profile) => {
   const userId = req.user._id;
 
-  User.findById(userId)
+  User.findByIdAndUpdate(
+    userId,
+    profile,
+    { new: true, runValidators: true },
+  )
     .then((user) => {
       if (user === null) {
         throw new NotFoundError('Пользователь не найден');
       }
 
-      setResponse({ res, messageKey: 'data', message: user });
+      setResponse({ res, messageKey: 'user', message: user });
     })
     .catch(next);
+};
+
+const getUser = (req, res, next) => {
+  findUserById(req, res, next, req.params.userId);
+};
+
+const getMe = (req, res, next) => {
+  findUserById(req, res, next, req.user._id);
 };
 
 const getUsers = (req, res, next) => {
@@ -65,24 +75,6 @@ const registration = (req, res, next) => {
         httpStatus: HTTP_201,
       }))
       .catch(next));
-};
-
-const profileUpdateResponse = (res, req, next, profile) => {
-  const userId = req.user._id;
-
-  User.findByIdAndUpdate(
-    userId,
-    profile,
-    { new: true, runValidators: true },
-  )
-    .then((user) => {
-      if (user === null) {
-        throw new NotFoundError('Пользователь не найден');
-      }
-
-      setResponse({ res, messageKey: 'user', message: user });
-    })
-    .catch(next);
 };
 
 const updateUser = (req, res, next) => {

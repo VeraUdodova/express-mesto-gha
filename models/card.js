@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const { urlRegExp } = require('../utils/utils');
 
 const cardSchema = new mongoose.Schema({
   name: {
@@ -10,6 +11,12 @@ const cardSchema = new mongoose.Schema({
   link: {
     type: String,
     required: true,
+    validate: {
+      validator(v) {
+        return urlRegExp.test(v);
+      },
+      message: 'Неправильный формат ссылки',
+    },
   },
   owner: {
     type: mongoose.Schema.Types.ObjectId,
