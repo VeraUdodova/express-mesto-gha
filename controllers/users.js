@@ -102,8 +102,7 @@ const login = (req, res, next) => {
           httpOnly: true,
           sameSite: true,
         })
-        .send({ token });
-      // если не передавать токен, то тесты не проходят
+        .send({ email });
     })
     .catch(next);
 };
